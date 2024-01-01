@@ -3,39 +3,51 @@ import { getSelf } from "./auth.service";
 import { resolve } from "path";
 
 export const getRecommended = async () => {
-    // Check skeleton
-    // await new Promise(resolve => setTimeout(resolve, 5000))
+  // Check skeleton
+  // await new Promise(resolve => setTimeout(resolve, 5000))
 
-    let userId;
-    try {
-        const self = await getSelf();
-        userId = self.id;
-    } catch {
-        userId = null;
-    }
+  let userId;
+  try {
+    const self = await getSelf();
+    userId = self.id;
+  } catch {
+    userId = null;
+  }
 
-    let users = [];
+  let users = [];
 
-    if (userId) {
-        users = await db.user.findMany({
-            where: {
-                NOT: {
-                    id: userId
-                }
+  if (userId) {
+    users = await db.user.findMany({
+      where: {
+        AND: [
+          {
+            // Not get current user
+            NOT: {
+              id: userId,
             },
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
-    } else {
-        users = await db.user.findMany({
-            orderBy: {
-                createdAt: "desc"
-            }
-        })
-    }
+          },
+          {
+            // Table user
+            // Not take users followed of current user for recommened list
+            NOT: {
+              followedBy: {
+                some: { followerId: userId },
+              },
+            },
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } else {
+    users = await db.user.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  }
 
-
-
-    return users
-} 
+  return users;
+};

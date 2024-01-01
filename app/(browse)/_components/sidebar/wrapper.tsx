@@ -4,7 +4,7 @@ import { useIsClient } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/store/use-sidebar";
 import { ToggleSkeleton } from "./toggle";
-import { RecommendedSkeleton } from "./user_item";
+import { RecommendedSkeleton } from "./skeletons";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -28,7 +28,7 @@ export const Wrapper = ({ children }: WrapperProps) => {
     <aside
       className={cn(
         "fixed left-0 flex flex-col w-60 h-full bg-background border-r border-[#2D2E35] z-50",
-        collapsed && "w-[70px]"
+        collapsed && "w-[70px]",
       )}
     >
       {children}

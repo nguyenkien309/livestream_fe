@@ -12,10 +12,16 @@ import { LiveBadge } from "@/components/live_badge";
 interface UserItemProps {
   userName: string;
   imageUrl: string;
+  category?: string;
   isLive?: boolean;
 }
 
-export const UserItem = ({ userName, imageUrl, isLive }: UserItemProps) => {
+export const UserItem = ({
+  userName,
+  imageUrl,
+  category,
+  isLive,
+}: UserItemProps) => {
   const pathName = usePathname();
   const { collapsed, onCollapse, onExpand } = useSidebar((state) => state);
   const href = `/${userName}`;
@@ -27,7 +33,7 @@ export const UserItem = ({ userName, imageUrl, isLive }: UserItemProps) => {
       className={cn(
         "w-full h-12",
         collapsed ? "justify-center" : "justify-start",
-        isActive && "bg-accent"
+        isActive && "bg-accent",
       )}
       asChild
     >
@@ -35,7 +41,7 @@ export const UserItem = ({ userName, imageUrl, isLive }: UserItemProps) => {
         <div
           className={cn(
             "flex items-center w-full gap-x-4",
-            collapsed && "justify-center"
+            collapsed && "justify-center",
           )}
         >
           <UserAvatar
@@ -49,7 +55,7 @@ export const UserItem = ({ userName, imageUrl, isLive }: UserItemProps) => {
               <p className="truncate font-semibold">{userName}</p>
               {isLive && (
                 <p className="truncate text-[11px] text-muted-foreground">
-                  Category
+                  {category}
                 </p>
               )}
             </div>
@@ -58,26 +64,5 @@ export const UserItem = ({ userName, imageUrl, isLive }: UserItemProps) => {
         </div>
       </Link>
     </Button>
-  );
-};
-
-export const UserItemSkeleton = () => {
-  return (
-    <li className="flex items-center gap-x-4 px-3 py-2">
-      <Skeleton className="min-h-[32px] min-w-[32px] rounded-full" />
-      <div className="flex-1">
-        <Skeleton className="h-6" />
-      </div>
-    </li>
-  );
-};
-
-export const RecommendedSkeleton = () => {
-  return (
-    <ul className="px-2">
-      {[...Array(3)].map((_, i) => (
-        <UserItemSkeleton key={i} />
-      ))}
-    </ul>
   );
 };

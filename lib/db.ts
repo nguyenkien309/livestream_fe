@@ -1,9 +1,9 @@
-import {PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 // Ensure single instance when hot reload happens
 // Prevents unnecessary multiple Prisma clients that mean too many connections
 declare global {
-    var prisma: PrismaClient | undefined;
+  var prisma: PrismaClient | undefined;
 }
 
 export const db: PrismaClient = globalThis.prisma || new PrismaClient();
