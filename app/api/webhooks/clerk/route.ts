@@ -1,9 +1,10 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, WebhookEventType } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
+import { ClerkEvents } from "../../constants";
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
@@ -52,36 +53,43 @@ export async function POST(req: Request) {
   // Get the ID and type
   // const { id } = evt.data;
   const eventType = evt.type;
-
-  if (eventType === "user.created") {
-    await db.user.create({
-      data: {
-        externalUserId: payload.data.id,
-        username: payload.data.username,
-        imageUrl: payload.data.image_url,
-      },
-    });
-  }
-
-  if (eventType === "user.updated") {
-    await db.user.update({
-      where: {
-        externalUserId: payload.data.id,
-      },
-      data: {
-        username: payload.data.username,
-        imageUrl: payload.data.image_url,
-      },
-    });
-  }
-
-  if (eventType === "user.deleted") {
-    await db.user.delete({
-      where: {
-        externalUserId: payload.data.id,
-      },
-    });
-  }
+  await handleClerkEvents(eventType, payload);
 
   return new Response("", { status: 200 });
-}
+};
+
+export const handleClerkEvents = async (
+  event: WebhookEventType,
+  payload: any,
+) => {
+  const { data } = payload;
+  switch (event) {
+    case ClerkEvents.UserCreated:
+      return await db.user.create({
+        data: {
+          externalUserId: data.id,
+          username: data.username,
+          imageUrl: data.image_url,
+        },
+      });
+    case ClerkEvents.UserUpdated:
+      return await db.user.update({
+        where: {
+          externalUserId: data.id,
+        },
+        data: {
+          username: data.username,
+          imageUrl: data.image_url,
+        },
+      });
+    case ClerkEvents.UserDeleted:
+      return await db.user.delete({
+        where: {
+          externalUserId: data.id,
+        },
+      });
+
+    default:
+      return;
+  }
+};
