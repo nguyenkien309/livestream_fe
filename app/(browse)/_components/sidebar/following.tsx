@@ -1,6 +1,6 @@
 "use client";
 
-import { useSidebar } from "@/store/use-sidebar";
+import { useSidebar } from "@/store/sidebar";
 import { Follow, User } from "@prisma/client";
 import { UserItem } from "./user_item";
 import { ToggleSkeleton } from "./toggle";

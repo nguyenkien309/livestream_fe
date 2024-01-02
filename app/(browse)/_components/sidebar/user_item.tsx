@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { useSidebar } from "@/store/use-sidebar";
+import { useSidebar } from "@/store/sidebar";
 import { usePathname } from "next/navigation";
 import { UserAvatar } from "@/components/user_avatar";
 import { LiveBadge } from "@/components/live_badge";
