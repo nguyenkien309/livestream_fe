@@ -70,6 +70,11 @@ export const handleClerkEvents = async (
           externalUserId: data.id,
           username: data.username,
           imageUrl: data.image_url,
+          stream: {
+            create: {
+              name: `${payload.data.username}'s stream`,
+            },
+          },
         },
       });
     case ClerkEvents.UserUpdated:

@@ -28,10 +28,18 @@ export const getRecommended = async () => {
           },
           {
             // Table user
-            // Not take users followed of current user for recommened list
+            // Not take users followed by current user for recommened list
             NOT: {
               followedBy: {
                 some: { followerId: userId },
+              },
+            },
+          },
+          {
+            // Not take users blocked by current user
+            NOT: {
+              blocking: {
+                some: { blockedId: userId },
               },
             },
           },
