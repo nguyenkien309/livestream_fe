@@ -15,7 +15,6 @@ model User {
   imageUrl       String  @db.Text
   externalUserId String  @unique
   bio            String? @db.Text
-  communityUrl   String? @db.Text
 
   following  Follow[] @relation("Following")
   followedBy Follow[] @relation("FollowedBy")
@@ -33,6 +32,8 @@ model Stream {
   id           String  @id @default(uuid())
   name         String  @db.Text
   thumbnailUrl String? @db.Text
+  discordUrl   String? @db.Text
+  category     String? @db.Text
 
   ingressId String? @unique
   serverUrl String? @db.Text

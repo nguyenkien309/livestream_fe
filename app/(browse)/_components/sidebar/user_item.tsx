@@ -33,7 +33,7 @@ export const UserItem = ({
       className={cn(
         "w-full h-12",
         collapsed ? "justify-center" : "justify-start",
-        isActive && "bg-accent",
+        isActive && "bg-accent"
       )}
       asChild
     >
@@ -41,7 +41,7 @@ export const UserItem = ({
         <div
           className={cn(
             "flex items-center w-full gap-x-4",
-            collapsed && "justify-center",
+            collapsed && "justify-center"
           )}
         >
           <UserAvatar

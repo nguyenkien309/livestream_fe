@@ -1,12 +1,13 @@
 "use server";
 
-// import { followUser, unfollowUser } from "@/app/api/follow.service";
+import { getCurrentUser } from "@/app/api/auth.service";
 import { followUser, unfollowUser } from "@/app/api/follow.service";
 import { revalidatePath } from "next/cache";
 
 export const onFollow = async (id: string) => {
   try {
-    const followedUser = await followUser(id);
+    const currentUser = await getCurrentUser();
+    const followedUser = await followUser(currentUser.id, id);
 
     // Reset page cache
     revalidatePath("/");
@@ -23,7 +24,8 @@ export const onFollow = async (id: string) => {
 
 export const onUnfollow = async (id: string) => {
   try {
-    const unFollowedUser = await unfollowUser(id);
+    const currentUser = await getCurrentUser();
+    const unFollowedUser = await unfollowUser(currentUser.id, id);
 
     revalidatePath("/");
 

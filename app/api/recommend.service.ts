@@ -1,5 +1,5 @@
 import { db } from "../../lib/db";
-import { getSelf } from "./auth.service";
+import { getCurrentUser, } from "./auth.service";
 import { resolve } from "path";
 
 export const getRecommended = async () => {
@@ -8,8 +8,8 @@ export const getRecommended = async () => {
 
   let userId;
   try {
-    const self = await getSelf();
-    userId = self.id;
+    const currentUser = await getCurrentUser();
+    userId = currentUser.id;
   } catch {
     userId = null;
   }
@@ -21,39 +21,67 @@ export const getRecommended = async () => {
       where: {
         AND: [
           {
-            // Not get current user
             NOT: {
               id: userId,
             },
           },
           {
-            // Table user
-            // Not take users followed by current user for recommened list
             NOT: {
               followedBy: {
-                some: { followerId: userId },
+                some: {
+                  followerId: userId,
+                },
               },
             },
           },
           {
-            // Not take users blocked by current user
             NOT: {
               blocking: {
-                some: { blockedId: userId },
+                some: {
+                  blockedId: userId,
+                },
               },
             },
           },
         ],
       },
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        stream: {
+          select: {
+            isLive: true,
+          },
+        },
       },
-    });
+      orderBy: [
+        {
+          stream: {
+            isLive: "desc",
+          }
+        },
+        {
+          createdAt: "desc"
+        },
+      ]
+    })
   } else {
     users = await db.user.findMany({
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        stream: {
+          select: {
+            isLive: true,
+          },
+        },
       },
+      orderBy: [
+        {
+          stream: {
+            isLive: "desc",
+          }
+        },
+        {
+          createdAt: "desc"
+        },
+      ]
     });
   }
 
