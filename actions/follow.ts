@@ -6,8 +6,7 @@ import { revalidatePath } from "next/cache";
 
 export const onFollow = async (id: string) => {
   try {
-    const currentUser = await getCurrentUser();
-    const followedUser = await followUser(currentUser.id, id);
+    const followedUser = await followUser(id);
 
     // Reset page cache
     revalidatePath("/");
@@ -25,7 +24,7 @@ export const onFollow = async (id: string) => {
 export const onUnfollow = async (id: string) => {
   try {
     const currentUser = await getCurrentUser();
-    const unFollowedUser = await unfollowUser(currentUser.id, id);
+    const unFollowedUser = await unfollowUser(id);
 
     revalidatePath("/");
 
