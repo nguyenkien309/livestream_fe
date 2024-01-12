@@ -9,7 +9,7 @@ const webhookReceiver = new WebhookReceiver(
   process.env.LIVEKIT_API_SECRET!,
 );
 
-export const POST = async (req: Request) => {
+export async function POST(req: Request) {
   const body = await req.text();
   const headerPayload = headers();
   const authorization = headerPayload.get("Authorization");

@@ -4,8 +4,7 @@ import { WebhookEvent, WebhookEventType } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { ClerkEvents } from "../../constants";
 
-export const POST = async (req: Request) => {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
+export async function POST(req: Request) {
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
