@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Navbar } from "./_components/navbar";
 import { Sidebar } from "./_components/sidebar";
 import { Container } from "./_components/container";
-import { getSelfByUsername } from "@/app/api/auth.service";
+import { getCurrentUserByUsername } from "@/app/api/auth.service";
 
 interface CreatorLayoutProps {
   params: { username: string };
@@ -11,9 +11,9 @@ interface CreatorLayoutProps {
 }
 
 const CreatorLayout = async ({ params, children }: CreatorLayoutProps) => {
-  const self = await getSelfByUsername(params.username);
+  const currentUser = await getCurrentUserByUsername(params.username);
 
-  if (!self) {
+  if (!currentUser) {
     redirect("/");
   }
 

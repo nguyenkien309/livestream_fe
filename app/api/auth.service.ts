@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs";
 
 import { db } from "@/lib/db";
 
-export const getSelf = async () => {
+export const getCurrentUser = async () => {
   const self = await currentUser();
 
   if (!self || !self.username) {
@@ -31,10 +31,10 @@ export const getSelf = async () => {
  * Scalability:
  * -> Something like features admins, moderators to handle while live streaming
  */
-export const getSelfByUsername = async (username: string) => {
-  const self = await currentUser();
+export const getCurrentUserByUsername = async (username: string) => {
+  const currentClerkUser = await currentUser();
 
-  if (!self || !self.username) {
+  if (!currentClerkUser || !currentClerkUser.username) {
     throw new Error("Unauthorized");
   }
 
@@ -46,7 +46,7 @@ export const getSelfByUsername = async (username: string) => {
     throw new Error("User not found");
   }
 
-  if (self.username !== user.username) {
+  if (currentClerkUser.username !== user.username) {
     throw new Error("Unauthorized");
   }
 

@@ -1,33 +1,42 @@
 "use server";
 
+import { getCurrentUser } from "@/app/api/auth.service";
 import { blockUser, unblockUser } from "@/app/api/block.service";
+import { RoomServiceClient } from "livekit-server-sdk";
 import { revalidatePath } from "next/cache";
 
+const roomService = new RoomServiceClient(
+  process.env.LIVEKIT_API_URL!,
+  process.env.LIVEKIT_API_KEY!,
+  process.env.LIVEKIT_API_SECRET!,
+);
+
 export const onBlock = async (id: string) => {
-  // TODO
-  // Disconnect livestream
-  // Allow to kick the guest
-  const blockedUser = await blockUser(id);
+  const currentUser = await getCurrentUser();
 
-  // Reset page cache
-  revalidatePath("/");
+  let blockedUser;
 
-  if (blockedUser) {
-    revalidatePath(`/${blockedUser.blocked.username}`);
+  try {
+    blockedUser = await blockUser(currentUser.id, id);
+  } catch {
+    // User is a guest
   }
+
+  try {
+    await roomService.removeParticipant(currentUser.id, id);
+  } catch {
+    // User is not in the room
+  }
+
+  revalidatePath(`/u/${currentUser.username}/community`);
 
   return blockedUser;
 };
 
-export const onUnBlock = async (id: string) => {
-  const unBlockedUser = await unblockUser(id);
+export const onUnblock = async (id: string) => {
+  const currentUser = await getCurrentUser();
+  const unblockedUser = await unblockUser(currentUser.id, id);
 
-  // Reset page cache
-  revalidatePath("/");
-
-  if (unBlockedUser) {
-    revalidatePath(`/${unBlockedUser.blocked.username}`);
-  }
-
-  return unBlockedUser;
+  revalidatePath(`/u/${currentUser.username}/community`);
+  return unblockedUser;
 };
