@@ -35,7 +35,6 @@ export const Video = ({ hostName, hostIdentity }: VideoProps) => {
   } else {
     content = <LiveVideo participant={participant} />;
   }
-  console.log(content);
 
   return <div className="aspect-video border-b group relative">{content}</div>;
 };
