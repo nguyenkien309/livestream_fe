@@ -1,20 +1,21 @@
 import { notFound } from "next/navigation";
+
+import { StreamPlayer } from "@/components/stream_player";
+import { getUserByUsername } from "@/app/api/user.service";
 import { checkFollowUser } from "@/app/api/follow.service";
 import { checkBlockUser } from "@/app/api/block.service";
-import { getUserByUserName } from "@/app/api/user.service";
-import { Actions } from "./_components/actions";
 
-// Clerk use username
 interface UserPageProps {
   params: {
     username: string;
+    discordUrl?: string | null;
   };
 }
 
-export const UserPage = async ({ params }: UserPageProps) => {
-  const user = await getUserByUserName(params.username);
+const UserPage = async ({ params }: UserPageProps) => {
+  const user = await getUserByUsername(params.username);
 
-  if (!user) {
+  if (!user || !user.stream) {
     notFound();
   }
 
@@ -26,13 +27,7 @@ export const UserPage = async ({ params }: UserPageProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <p>User : {user.username}</p>
-      <p>User : {user.id}</p>
-      <p>is follow : {`${isFollowing}`}</p>
-      <p>is blocked : {`${isBlocked}`}</p>
-      <Actions userId={user.id} isFollowing={isFollowing} />
-    </div>
+    <StreamPlayer user={user} stream={user.stream} isFollowing={isFollowing} />
   );
 };
 

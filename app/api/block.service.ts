@@ -1,28 +1,27 @@
 import { db } from "@/lib/db";
-import { getSelf } from "./auth.service";
+import { getCurrentUser } from "./auth.service";
 
-export const checkBlockUser = async (id: string) => {
+export const isBlockedByUser = async (id: string) => {
   try {
-    const self = await getSelf();
+    const currentUser = await getCurrentUser();
 
     const otherUser = await db.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
 
-    if (!otherUser) throw new Error("User not found");
+    if (!otherUser) {
+      throw new Error("User not found");
+    }
 
-    if (otherUser.id === self.id) {
+    if (otherUser.id === currentUser.id) {
       return false;
     }
 
-    // findUnique() use index
     const existingBlock = await db.block.findUnique({
       where: {
         blockerId_blockedId: {
           blockerId: otherUser.id,
-          blockedId: self.id,
+          blockedId: currentUser.id,
         },
       },
     });
@@ -33,9 +32,41 @@ export const checkBlockUser = async (id: string) => {
   }
 };
 
-export const blockUser = async (id: string) => {
-  const self = await getSelf();
-  if (self.id === id) {
+export const checkBlockUser = async (id: string) => {
+  try {
+    const currentUser = await getCurrentUser();
+
+    const otherUser = await db.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!otherUser) throw new Error("User not found");
+
+    if (otherUser.id === currentUser.id) {
+      return false;
+    }
+
+    // findUnique() use index
+    const existingBlock = await db.block.findUnique({
+      where: {
+        blockerId_blockedId: {
+          blockerId: otherUser.id,
+          blockedId: currentUser.id,
+        },
+      },
+    });
+
+    return !!existingBlock;
+  } catch {
+    return false;
+  }
+};
+
+export const blockUser = async (currentUserId: string, id: string) => {
+  // const self = await getCurrentUser();
+  if (currentUserId === id) {
     throw new Error("Cannot block yourself");
   }
 
@@ -49,7 +80,7 @@ export const blockUser = async (id: string) => {
     where: {
       blockerId_blockedId: {
         blockerId: otherUser.id,
-        blockedId: self.id,
+        blockedId: currentUserId,
       },
     },
   });
@@ -68,7 +99,7 @@ export const blockUser = async (id: string) => {
   // })
   const block = await db.block.create({
     data: {
-      blockerId: self.id,
+      blockerId: currentUserId,
       blockedId: otherUser.id,
     },
     include: {
@@ -79,10 +110,10 @@ export const blockUser = async (id: string) => {
   return block;
 };
 
-export const unblockUser = async (id: string) => {
-  const self = await getSelf();
+export const unblockUser = async (currentUserId: string, id: string) => {
+  // const self = await getCurrentUser();
 
-  if (self.id === id) {
+  if (currentUserId === id) {
     throw new Error("Cannot unblock yourself");
   }
 
@@ -97,7 +128,7 @@ export const unblockUser = async (id: string) => {
   const existingBlock = await db.block.findUnique({
     where: {
       blockerId_blockedId: {
-        blockerId: self.id,
+        blockerId: currentUserId,
         blockedId: otherUser.id,
       },
     },
@@ -120,11 +151,11 @@ export const unblockUser = async (id: string) => {
 };
 
 export const getBlockedUsers = async () => {
-  const self = await getSelf();
+  const currentUser = await getCurrentUser();
 
   const blockedUsers = await db.block.findMany({
     where: {
-      blockerId: self.id,
+      blockerId: currentUser.id,
     },
     include: {
       blocked: true,
